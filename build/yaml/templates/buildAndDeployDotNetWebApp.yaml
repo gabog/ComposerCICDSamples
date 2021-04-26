@@ -75,11 +75,11 @@ steps:
     zipAfterPublish: True
 
 # Publish output artifacts to Azure DevOps
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish build artifacts'
-  inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-    artifactName: 'BuildArtifacts-$(Build.BuildId)'
+#- task: PublishBuildArtifacts@1
+#  displayName: 'Publish build artifacts'
+#  inputs:
+#    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+#    artifactName: 'BuildArtifacts-$(Build.BuildId)'
 
 # Deploy the web app to azure
 - task: AzureWebApp@1
