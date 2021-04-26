@@ -1,3 +1,9 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+#
+# Builds, deploys and configures the bot's dotnet web app
+# 
+
 parameters:
 - name: azureServiceConnection
   displayName: Azure Service Connection
@@ -20,11 +26,11 @@ parameters:
   type: string
 
 - name: microsoftAppId
-  displayName: Microsoft App ID
+  displayName: Bot's Microsoft app ID
   type: string
 
 - name: microsoftAppPassword
-  displayName: Microsoft App Password
+  displayName: Bot's Microsoft app Password
   type: string
 
 - name: luisEndpoint
@@ -57,6 +63,7 @@ parameters:
 
 steps:
 # Build bot
+# Note: this step also packages the generated folder created by the buildAndDeployModels yaml script.
 # https://stackoverflow.com/questions/63788646/naming-resulting-zip-archive-in-azure-pipelines-build
 - task: DotNetCoreCLI@2
   displayName: 'Build the bot publishing package'
@@ -90,8 +97,8 @@ steps:
   inputs:
     azureSubscription: ${{ parameters.azureServiceConnection }}
     appName: '${{ parameters.webAppName }}'
-    # To deploy the settings on a slot, provide slot name as below. By default, the settings would be applied to the actual Web App (Production slot)
-    # slotName: staging
+    # To deploy the settings on a slot, provide slot name as below (e.g: slotName: staging). 
+    # By default, the settings would be applied to the actual Web App (Production slot) 
     appSettings: |
       [
         {

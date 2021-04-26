@@ -1,7 +1,11 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+#
 # Starter pipeline
-# Start with a minimal pipeline to deploy a basic assistant bot that you can customize to build and deploy your code.
+# Minimal pipeline to deploy a basic assistant bot that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
+#
 
 trigger:
 - none
@@ -9,11 +13,11 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-# These parameters map Azure DevOps pipeline variables to paramaters that are used in
-# the different pipeline tasks.
+# These parameters map Azure DevOps pipeline variables to paramaters 
+# that are used in # the different pipeline tasks.
 parameters:
 - name: azureServiceConnection
-  displayName: Azure Service Connection
+  displayName: Azure service connection
   type: string
   default: $(AZURESERVICECONNECTION)
 
@@ -23,17 +27,17 @@ parameters:
   default: $(BOTNAME)
 
 - name: microsoftAppId
-  displayName: Microsoft App ID
+  displayName: Bot's Microsoft app ID
   type: string
   default: $(MICROSOFTAPPID)
 
 - name: microsoftAppPassword
-  displayName: Microsoft App Password
+  displayName: Bot's Microsoft app password
   type: string
   default: $(MICROSOFTAPPPASSWORD)
 
 - name: resourceGroupName
-  displayName: Azure Resource group
+  displayName: Azure resource group
   type: string
   default: $(RESOURCEGROUPNAME)
 
@@ -43,19 +47,19 @@ parameters:
   default: $(WEBAPPNAME)
 
 - name: botProjectDirectory
-  displayName: Relative path to the bot csproj
+  displayName: Relative path to the bot's csproj file
   type: string
   default: $(BOTPROJECTDIRECTORY) 
   
 - name: botProjectName
-  displayName: Bot project name (csproj)
+  displayName: Bot's project name (csproj)
   type: string
   default: $(BOTPROJECTNAME) 
 
 # LUIS Parameters
 # General
 - name: luisAppId
-  displayName: LUIS App ID
+  displayName: LUIS app ID
   type: string
   default: $(LUISAPPID)
   
@@ -142,4 +146,3 @@ steps:
     qnaHostName: ${{ parameters.qnaHostName }}
     qnaKnowledgebaseId: ${{ parameters.qnaKnowledgebaseId }}
     qnaRegion: ${{ parameters.qnaRegion }}
-    

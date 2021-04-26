@@ -1,5 +1,12 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+#
+# Builds, deploys and train language models (LUIS and QnA Maker)
+#
+
 parameters:
 - name: sourceDirectory
+  displayName: Directory to the source code in the build pipeline
   type: string
 
 - name: botName
@@ -19,6 +26,24 @@ parameters:
   type: string
 
 steps:
+
+# Prepare working folders
+- task: PowerShell@2
+  displayName: 'Prepare working folders'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $generatedDirectory = "${{ parameters.sourceDirectory }}/generated"
+      
+      # Clean and recreate the generated directory
+      if (Test-Path $generatedDirectory)
+      {
+        Remove-Item -Path $generatedDirectory -Force -Recurse
+      }
+
+      $outputDirectory = "$generatedDirectory/interruption"
+      New-Item -Path /. -name $outputDirectory -ItemType "directory"
+
 # Cross train LU models (LUIS and QnA)
 - task: PowerShell@2
   displayName: 'Cross train LUIS and QnA'
@@ -28,10 +53,7 @@ steps:
       $sourceDirectory = "${{ parameters.sourceDirectory }}"
       $outputDirectory = "${{ parameters.sourceDirectory }}/generated/interruption"
 
-      # Create output directory
-      New-Item -Path /. -name $outputDirectory -ItemType "directory"
-      
-      # Cross train
+      # Cross train models
       bf luis:cross-train --in $sourceDirectory --out $outputDirectory --config $sourceDirectory/settings/cross-train.config.json --force
 
       # List generated files
@@ -51,6 +73,7 @@ steps:
       bf luis:build --in $sourceDirectory --out $outputDirectory --authoringKey ${{ parameters.luisAuthoringKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
       
       # Workaround remove version element from LUIS settings file
+      # TODO: remove once https://github.com/microsoft/botframework-cli/pull/1215 is merged
       $luisSettingsFile = "$outputDirectory/luis.settings.composer.${{ parameters.luisAuthoringRegion }}.json"
       Set-Content -Path $luisSettingsFile -Value (get-content -Path $luisSettingsFile | Select-String -Pattern '"version":' -NotMatch)
 
@@ -66,6 +89,7 @@ steps:
       $sourceDirectory = "${{ parameters.sourceDirectory }}/generated/interruption"
       $outputDirectory = "${{ parameters.sourceDirectory }}/generated"
       
+      # Build, train and publish the QnA maker models
       bf qnamaker:build --in $sourceDirectory --out $outputDirectory --subscriptionKey ${{ parameters.qnaSubscriptionKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
 
 # Publish output artifacts to Azure DevOps
