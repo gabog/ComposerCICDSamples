@@ -66,37 +66,37 @@ steps:
 # Note: this step also packages the generated folder created by the buildAndDeployModels yaml script.
 # https://stackoverflow.com/questions/63788646/naming-resulting-zip-archive-in-azure-pipelines-build
 - task: DotNetCoreCLI@2
-  displayName: 'Build the bot publishing package'
+  displayName: "Build the bot publishing package"
   inputs:
-    command: 'publish'
-    projects: '${{ parameters.botProjectFile }}'
+    command: "publish"
+    projects: "${{ parameters.botProjectFile }}"
     publishWebProjects: false #setting it to false to make sure only this csproj gets compiled and published.
-    arguments: '--output $(Build.ArtifactStagingDirectory)/WebAppZip'
+    arguments: "--output $(System.DefaultWorkingDirectory)/output/zipDeploy"
     zipAfterPublish: True
 
 # Publish output artifacts to Azure DevOps
-#- task: PublishBuildArtifacts@1
-#  displayName: 'Publish build artifacts'
-#  inputs:
-#    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-#    artifactName: 'BuildArtifacts-$(Build.BuildId)'
+- task: PublishBuildArtifacts@1
+  displayName: "Publish build artifacts"
+  inputs:
+    pathtoPublish: "$(System.DefaultWorkingDirectory)/output/zipDeploy" 
+    artifactName: "BuildArtifacts-$(Build.BuildId)"
 
 # Deploy the web app to azure
 - task: AzureWebApp@1
-  displayName: 'Deploy Azure Web App: ${{ parameters.webAppName }}'
+  displayName: "Deploy Azure Web App: ${{ parameters.webAppName }}"
   inputs:
     azureSubscription: ${{ parameters.azureServiceConnection }}
-    appName: '${{ parameters.webAppName }}'
-    resourceGroupName: '${{ parameters.resourceGroupName }}'
-    package: '$(Build.ArtifactStagingDirectory)/WebAppZip/${{ parameters.webAppName }}.zip'
+    appName: "${{ parameters.webAppName }}"
+    resourceGroupName: "${{ parameters.resourceGroupName }}"
+    package: "$(System.DefaultWorkingDirectory)/output/zipDeploy/${{ parameters.webAppName }}.zip"
     deploymentMethod: zipDeploy
 
 # Configure web appSettings
 - task: AzureAppServiceSettings@1
-  displayName: Configure App Service Settings
+  displayName: "Configure App Service Settings"
   inputs:
-    azureSubscription: ${{ parameters.azureServiceConnection }}
-    appName: '${{ parameters.webAppName }}'
+    azureSubscription: "${{ parameters.azureServiceConnection }}"
+    appName: "${{ parameters.webAppName }}"
     # To deploy the settings on a slot, provide slot name as below (e.g: slotName: staging). 
     # By default, the settings would be applied to the actual Web App (Production slot) 
     appSettings: |

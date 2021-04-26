@@ -97,7 +97,7 @@ steps:
   displayName: "Compress generated files"
   inputs:
     rootFolderOrFile: "${{ parameters.sourceDirectory }}/generated"
-    includeRootFolder: false
+    includeRootFolder: true
     archiveType: "zip"
     archiveFile: "$(System.DefaultWorkingDirectory)/output/generated.zip"
     verbose: true

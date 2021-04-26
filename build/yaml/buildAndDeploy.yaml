@@ -27,12 +27,12 @@ parameters:
   default: $(BOTNAME)
 
 - name: microsoftAppId
-  displayName: Bot's Microsoft app ID
+  displayName: Bot"s Microsoft app ID
   type: string
   default: $(MICROSOFTAPPID)
 
 - name: microsoftAppPassword
-  displayName: Bot's Microsoft app password
+  displayName: Bot"s Microsoft app password
   type: string
   default: $(MICROSOFTAPPPASSWORD)
 
@@ -47,12 +47,12 @@ parameters:
   default: $(WEBAPPNAME)
 
 - name: botProjectDirectory
-  displayName: Relative path to the bot's csproj file
+  displayName: Relative path to the bot"s csproj file
   type: string
   default: $(BOTPROJECTDIRECTORY) 
   
 - name: botProjectName
-  displayName: Bot's project name (csproj)
+  displayName: Bot"s project name (csproj)
   type: string
   default: $(BOTPROJECTNAME) 
 
@@ -124,25 +124,25 @@ steps:
 - template: templates/buildAndDeployModels.yaml
   parameters:
     sourceDirectory: "$(System.DefaultWorkingDirectory)/${{ parameters.botProjectDirectory }}"
-    botName: ${{ parameters.botName }}
-    luisAuthoringKey: ${{ parameters.luisAuthoringKey }}
-    luisAuthoringRegion: ${{ parameters.luisAuthoringRegion }}
-    qnaSubscriptionKey: ${{ parameters.qnaSubscriptionKey }}
+    botName: "${{ parameters.botName }}"
+    luisAuthoringKey: "${{ parameters.luisAuthoringKey }}"
+    luisAuthoringRegion: "${{ parameters.luisAuthoringRegion }}"
+    qnaSubscriptionKey: "${{ parameters.qnaSubscriptionKey }}"
 
 # Deploy and configure web app
 - template: templates/buildAndDeployDotNetWebApp.yaml
   parameters:
-    azureServiceConnection: ${{ parameters.azureServiceConnection }}
-    webAppName: ${{ parameters.webAppName }}
-    resourceGroupName: ${{ parameters.resourceGroupName }}
-    botProjectFile: '$(System.DefaultWorkingDirectory)/${{ parameters.botProjectDirectory }}/${{ parameters.botProjectName }}'
-    botName: ${{ parameters.botName }}
-    microsoftAppId: ${{ parameters.microsoftAppId }}
-    microsoftAppPassword: ${{ parameters.microsoftAppPassword }}
-    luisEndpoint: ${{ parameters.luisEndpoint }}
-    luisEndpointKey: ${{ parameters.luisEndpointKey }}
-    qnaSubscriptionKey: ${{ parameters.qnaSubscriptionKey }}
-    qnaEndpointKey: ${{ parameters.qnaEndpointKey }}
-    qnaHostName: ${{ parameters.qnaHostName }}
-    qnaKnowledgebaseId: ${{ parameters.qnaKnowledgebaseId }}
-    qnaRegion: ${{ parameters.qnaRegion }}
+    azureServiceConnection: "${{ parameters.azureServiceConnection }}"
+    webAppName: "${{ parameters.webAppName }}"
+    resourceGroupName: "${{ parameters.resourceGroupName }}"
+    botProjectFile: "$(System.DefaultWorkingDirectory)/${{ parameters.botProjectDirectory }}/${{ parameters.botProjectName }}"
+    botName: "${{ parameters.botName }}"
+    microsoftAppId: "${{ parameters.microsoftAppId }}"
+    microsoftAppPassword: "${{ parameters.microsoftAppPassword }}"
+    luisEndpoint: "${{ parameters.luisEndpoint }}"
+    luisEndpointKey: "${{ parameters.luisEndpointKey }}"
+    qnaSubscriptionKey: "${{ parameters.qnaSubscriptionKey }}"
+    qnaEndpointKey: "${{ parameters.qnaEndpointKey }}"
+    qnaHostName: "${{ parameters.qnaHostName }}"
+    qnaKnowledgebaseId: "${{ parameters.qnaKnowledgebaseId }}"
+    qnaRegion: "${{ parameters.qnaRegion }}"
