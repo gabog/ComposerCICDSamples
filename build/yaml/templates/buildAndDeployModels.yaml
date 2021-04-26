@@ -98,4 +98,4 @@ steps:
   inputs:
     pathtoPublish: "${{ parameters.sourceDirectory }}/generated" 
     artifactName: "BuildArtifacts-$(Build.BuildId)"
-    targetPath: "generated"
+    targetPath: "/generated"
