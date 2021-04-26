@@ -29,9 +29,9 @@ steps:
 
 # Prepare working folders
 - task: PowerShell@2
-  displayName: 'Prepare working folders'
+  displayName: "Prepare working folders"
   inputs:
-    targetType: 'inline'
+    targetType: "inline"
     script: |
       $generatedDirectory = "${{ parameters.sourceDirectory }}/generated"
       
@@ -46,9 +46,9 @@ steps:
 
 # Cross train LU models (LUIS and QnA)
 - task: PowerShell@2
-  displayName: 'Cross train LUIS and QnA'
+  displayName: "Cross train LUIS and QnA"
   inputs:
-    targetType: 'inline'
+    targetType: "inline"
     script: |
       $sourceDirectory = "${{ parameters.sourceDirectory }}"
       $outputDirectory = "${{ parameters.sourceDirectory }}/generated/interruption"
@@ -62,9 +62,9 @@ steps:
 
 # Publish LUIS models
 - task: PowerShell@2
-  displayName: 'Publish LUIS'
+  displayName: "Publish LUIS"
   inputs:
-    targetType: 'inline'
+    targetType: "inline"
     script: |
       $sourceDirectory = "${{ parameters.sourceDirectory }}/generated/interruption"
       $outputDirectory = "${{ parameters.sourceDirectory }}/generated"
@@ -82,9 +82,9 @@ steps:
 
 # Publish QnA Maker KB
 - task: PowerShell@2
-  displayName: 'Publish QnA'
+  displayName: "Publish QnA"
   inputs:
-    targetType: 'inline'
+    targetType: "inline"
     script: |
       $sourceDirectory = "${{ parameters.sourceDirectory }}/generated/interruption"
       $outputDirectory = "${{ parameters.sourceDirectory }}/generated"
@@ -94,7 +94,8 @@ steps:
 
 # Publish output artifacts to Azure DevOps
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish generated artifacts'
+  displayName: "Publish generated artifacts"
   inputs:
-    pathtoPublish: '${{ parameters.sourceDirectory }}/generated' 
-    artifactName: 'BuildArtifacts-$(Build.BuildId)/generated'
+    pathtoPublish: "${{ parameters.sourceDirectory }}/generated" 
+    artifactName: "BuildArtifacts-$(Build.BuildId)"
+    targetPath: "generated"
