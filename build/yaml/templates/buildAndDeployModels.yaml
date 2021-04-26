@@ -97,4 +97,4 @@ steps:
   displayName: 'Publish generated artifacts'
   inputs:
     pathtoPublish: '${{ parameters.sourceDirectory }}/generated' 
-    artifactName: 'BuildArtifacts-$(Build.BuildId)'
+    artifactName: 'BuildArtifacts-$(Build.BuildId)/generated'
