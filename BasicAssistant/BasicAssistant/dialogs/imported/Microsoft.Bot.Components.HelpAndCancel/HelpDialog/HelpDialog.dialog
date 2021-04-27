@@ -21,7 +21,7 @@
           "$designer": {
             "id": "5JQ9rf"
           },
-          "activity": "${SendActivity_5JQ9rf()}"
+          "activity": "${SendActivity_HelpOverview()}"
         }
       ]
     }
@@ -29,5 +29,5 @@
   "generator": "HelpDialog.lg",
   "recognizer": "HelpDialog.lu.qna",
   "id": "HelpDialog",
-  "$Imported": "5e02aff10b85658ec0dade8bad90f8b2"
+  "$Imported": "a1be0cb91341b11b8cd09b0301040284"
 }
