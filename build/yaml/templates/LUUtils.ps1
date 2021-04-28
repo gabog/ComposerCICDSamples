@@ -1,3 +1,9 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+# 
+# Contains a collection of common language understanding functions used in other scripts.
+#
+
 # Gets the list of lu models for a given recognizer
 function Get-LUModels
 {
@@ -63,6 +69,45 @@ function Get-OrchestratoModel
     }
 
     return $outDirectory
+}
+
+function Build-OrchestratorSnapshots
+{
+    param 
+    (
+        $models,
+        [string] $language,
+        [string] $modelDirectory,
+        [string] $outDirectory,
+        [string] $luFilesDirectory
+
+    )
+
+    $luModels = @()
+    if ($language -eq "english")
+    {
+        $luModels = Get-ChildItem $models -Include "*en*.lu" -Name
+    }
+    else
+    {
+        $luModels = Get-ChildItem $models -Exclude "*en*.lu" -Name
+    }
+
+    # Create folder to store input lu files
+    $inputDirectory = "$modelDirectory/input"
+    if ((Test-Path -Path "$inputDirectory") -eq $false) 
+    {
+        New-Item -Path "$inputDirectory" -ItemType "directory" -Force | Out-Null
+    }
+
+    # Copy cross trained lu files to input directory
+    foreach ($luModel in $luModels)
+    {
+        Copy-Item -Path "$luFilesDirectory/$luModel" -Destination "$inputDirectory/$luModel" -Force | Out-Null
+    }
+
+    # Train
+    bf orchestrator:build --in "$inputDirectory" --out "$outDirectory" --model "$modelDirectory"
 }
 
 # Helper to replace \ by / so it works on linux and windows

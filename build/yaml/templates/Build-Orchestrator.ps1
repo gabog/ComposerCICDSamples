@@ -91,19 +91,32 @@ $orchestratorConfig = "{
 # Download orchestrator models
 if ($useEnglishModel) 
 {
+    # Download model and update config
     $modelDirectory = Get-OrchestratoModel -language "english" -modelDirectory "$generatedDirectory/orchestratorModels"
     $orchestratorConfig.orchestrator.models | Add-Member -NotePropertyName en -NotePropertyValue (Get-NormalizedPath -path "$modelDirectory")
 
+    # Build trained snapshots and update config
+    Build-OrchestratorSnapshots -models $models -language "english" -modelDirectory $modelDirectory -outDirectory "$generatedDirectory" -luFilesDirectory $crossTrainedLUDirectory
+
 }
 
-if ($true) 
+if ($useMultilingualModel) 
 {
     $modelDirectory = Get-OrchestratoModel -language "multilingual" -modelDirectory "$generatedDirectory/orchestratorModels"
     $orchestratorConfig.orchestrator.models | Add-Member -NotePropertyName multilang -NotePropertyValue (Get-NormalizedPath -path "$modelDirectory")
 }
 
+Write-Output "Writing output file $generatedDirectory/orchestrator.settings.json"
+$BLUFILES = Get-ChildItem -Path "$generatedDirectory" -Include *.blu -Name
+foreach ($file in $BLUFILES) {
+    $key = $file -replace ".{4}$"
+    $key = $key.Replace(".", "_")
+    $key = $key.Replace("-", "_")
+    $orchestratorConfig.orchestrator.snapshots | Add-Member -NotePropertyName "$key" -NotePropertyValue (Get-NormalizedPath -path "$generatedDirectory/$file")
+}
 
 Write-Host ($orchestratorConfig | ConvertTo-Json)
+$orchestratorConfig | ConvertTo-Json | Out-File -FilePath "$generatedDirectory/orchestrator.settings.json"
 exit
 if ($useEnglishModel) {
     # Create folder for all en-us .lu files
