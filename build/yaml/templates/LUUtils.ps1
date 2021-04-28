@@ -71,6 +71,7 @@ function Get-OrchestratoModel
     return $outDirectory
 }
 
+# Builds and trains orchestrator snapshots (blu files)
 function Build-OrchestratorSnapshots
 {
     param 

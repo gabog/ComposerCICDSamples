@@ -44,7 +44,7 @@ steps:
       $outputDirectory = "$generatedDirectory/interruption"
       New-Item -Path /. -name $outputDirectory -ItemType "directory"
 
-# Cross train LU models (LUIS and QnA)
+# Cross train LU models
 - task: PowerShell@2
   displayName: "Cross train LU models"
   inputs:
