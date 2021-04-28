@@ -1,6 +1,7 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 # 
-# OrchestratorCICD.ps1 appsettings.json crossTrainedLUDirectory destGeneratedFolder destModelFolder
+# OrchestratorCICD.ps1 appsettings.json crossTrainedLUDirectory generatedDirectory destModelFolder
 # 
 # For example:
 # .\OrchestratorCICD.ps1 C:\Users\daveta\Downloads\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\settings\appsettings.json C:\Users\daveta\Downloads\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\generated\interruption C:\Users\daveta\Downloads\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\generated C:\Users\daveta\Downloads\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\generated\models
@@ -16,36 +17,35 @@ Param(
 	[string] $sourceDirectory,
 	[string] $crossTrainedLUDirectory,
 	[string] $appSettingsFile,
-	[string] $destGeneratedFolder,
+	[string] $generatedDirectory,
 	[string] $destModelFolder
 )
 
 # Import script with common functions
 . ($PSScriptRoot + "/LUUtils.ps1")
-#$scriptDir = Split-Path $script:MyInvocation.MyCommand.Path
-#Import-Module -Name "$scriptDir/LUUtils.ps1"
 
 if ($PSBoundParameters.Keys.Count -lt 5) {
     Write-Host "Dowload models and trains orchestrator" 
-    Write-Host 'Usage: OrchestratorCICD.ps1 appsettings.json crossTrainedLUDirectory destGeneratedFolder destModelFolder'
+    Write-Host 'Usage: OrchestratorCICD.ps1 appsettings.json crossTrainedLUDirectory generatedDirectory destModelFolder'
     Write-Host 'Parameters: '
     Write-Host ' appsettings.json - Bot appsettings.json file.'
     Write-Host ' crossTrainedLUDirectory - Directory containing .lu/.qna files to process.'
-    Write-Host ' destGeneratedFolder - Directory for processed .lu files'
+    Write-Host ' generatedDirectory - Directory for processed .lu files'
     Write-Host " destModelFolder - Directory that contains intent models (creates 'english' and 'multilingual' subfolders)."
     exit
 }
 
-Write-Output " appsettings.json: $appSettingsFile"
-Write-Output " crossTrainedLUDirectory: $crossTrainedLUDirectory"
-Write-Output " destGeneratedFolder: $destGeneratedFolder"
-Write-Output " destModelFolder: $destModelFolder"
+Write-Output "`t appsettings.json: $appSettingsFile"
+Write-Output "`t crossTrainedLUDirectory: $crossTrainedLUDirectory"
+Write-Output "`t generatedDirectory: $generatedDirectory"
+Write-Output "`t destModelFolder: $destModelFolder"
+
+$models = Get-LUModels -recognizerType "Microsoft.OrchestratorRecognizer" -crossTrainedLUDirectory $crossTrainedLUDirectory -sourceDirectory $sourceDirectory
 
 Write-Host "Orchestrator models"
-$models = Get-LUModels -recognizerType "Microsoft.OrchestratorRecognizer" -crossTrainedLUDirectory $crossTrainedLUDirectory -sourceDirectory $sourceDirectory
 foreach($model in $models)
 {
-    Write-Host $model
+    Write-Host "`t $model"
 }
 
 #Write-Host "LUIS models"
@@ -61,26 +61,26 @@ if ($models.Count -eq 0)
     exit 0        
 }
 
-exit 0
+# Load appsettings.json
 $appSettings = Get-Content -Path $appSettingsFile | ConvertFrom-Json
 
 # Determine which models we need to download and train.
-$downloadEnglish = $false
-$downloadMultiLingual = $false
-Write-Output ' Loading json settings'
+$useEnglishModel = $false
+$useMultilingualModel = $false
+Write-Output 'Loading appsettings...'
 foreach ($language in $appSettings.languages) {
     if ($language.StartsWith('en')) {
-        $downloadEnglish = $true
-        Write-Output ' Found English.'
+        $useEnglishModel = $true
+        Write-Output "`t Found English."
     }
     else {
-        $downloadMultiLingual = $true
-        Write-Output ' Found multilingual.'
+        $useMultilingualModel = $true
+        Write-Output "`t Found multilingual."
     }
 }
 
-# Composer config output file json.
-$COMPOSERCONFIG = "{
+# Create empty Composer config file for orchestrator.
+$orchestratorConfig = "{
     orchestrator:{
         models:{},
         snapshots:{}
@@ -88,8 +88,24 @@ $COMPOSERCONFIG = "{
 }" | ConvertFrom-Json
 
 
+# Download orchestrator models
+if ($useEnglishModel) 
+{
+    $modelDirectory = Get-OrchestratoModel -language "english" -modelDirectory "$generatedDirectory/orchestratorModels"
+    $orchestratorConfig.orchestrator.models | Add-Member -NotePropertyName en -NotePropertyValue (Get-NormalizedPath -path "$modelDirectory")
 
-if ($downloadEnglish) {
+}
+
+if ($true) 
+{
+    $modelDirectory = Get-OrchestratoModel -language "multilingual" -modelDirectory "$generatedDirectory/orchestratorModels"
+    $orchestratorConfig.orchestrator.models | Add-Member -NotePropertyName multilang -NotePropertyValue (Get-NormalizedPath -path "$modelDirectory")
+}
+
+
+Write-Host ($orchestratorConfig | ConvertTo-Json)
+exit
+if ($useEnglishModel) {
     # Create folder for all en-us .lu files
     if ((Test-Path -Path "$crossTrainedLUDirectory/english") -eq $false) {
         Write-Output "Creating $crossTrainedLUDirectory/english folder.."
@@ -112,11 +128,11 @@ if ($downloadEnglish) {
     }
 
     bf orchestrator:basemodel:get -o "$destModelFolder/english"
-    bf orchestrator:build --in "$crossTrainedLUDirectory/english" --out "$destGeneratedFolder" --model "$destModelFolder/english"
-    $COMPOSERCONFIG.orchestrator.models | Add-Member -NotePropertyName en -NotePropertyValue "$destModelFolder/english"
+    bf orchestrator:build --in "$crossTrainedLUDirectory/english" --out "$generatedDirectory" --model "$destModelFolder/english"
+    $orchestratorConfig.orchestrator.models | Add-Member -NotePropertyName en -NotePropertyValue "$destModelFolder/english"
 }
 
-if ($downloadMultiLingual) {
+if ($useMultilingualModel) {
     # Create folder for all non-en-us .lu files
     if ((Test-Path -Path "$crossTrainedLUDirectory/multilingual") -eq $false) {
         Write-Output "Creating $crossTrainedLUDirectory/multilingual folder.."
@@ -136,16 +152,16 @@ if ($downloadMultiLingual) {
         Write-Output "Created Multilingual model folder $destModelFolder/multilingual"
     }
     bf orchestrator:basemodel:get -o "$destModelFolder/multilingual" --versionId pretrained.20210205.microsoft.dte.00.06.unicoder_multilingual.onnx
-    bf orchestrator:build --in "$crossTrainedLUDirectory/multilingual" --out "$destGeneratedFolder" --model "$destModelFolder/multilingual"
-    $COMPOSERCONFIG.orchestrator.models | Add-Member -NotePropertyName multilang -NotePropertyValue "$destModelFolder/multilingual"
+    bf orchestrator:build --in "$crossTrainedLUDirectory/multilingual" --out "$generatedDirectory" --model "$destModelFolder/multilingual"
+    $orchestratorConfig.orchestrator.models | Add-Member -NotePropertyName multilang -NotePropertyValue "$destModelFolder/multilingual"
 }
 
-Write-Output "Writing output file $destGeneratedFolder/orchestrator.settings.json"
-$BLUFILES = Get-ChildItem -Path "$destGeneratedFolder" -Include *.blu -Name
+Write-Output "Writing output file $generatedDirectory/orchestrator.settings.json"
+$BLUFILES = Get-ChildItem -Path "$generatedDirectory" -Include *.blu -Name
 foreach ($file in $BLUFILES) {
     $key = $file -replace ".{4}$"
     $key = $key.Replace(".", "_")
-    $COMPOSERCONFIG.orchestrator.snapshots | Add-Member -NotePropertyName "$key" -NotePropertyValue "$crossTrainedLUDirectory/$file"
+    $orchestratorConfig.orchestrator.snapshots | Add-Member -NotePropertyName "$key" -NotePropertyValue "$crossTrainedLUDirectory/$file"
 }
 
-$COMPOSERCONFIG | ConvertTo-Json | Out-File -FilePath "$destGeneratedFolder/orchestrator.settings.json"
+$orchestratorConfig | ConvertTo-Json | Out-File -FilePath "$generatedDirectory/orchestrator.settings.json"

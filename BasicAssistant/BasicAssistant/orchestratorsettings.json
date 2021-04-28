@@ -1,9 +1,0 @@
-{
-  "modelPath": "C:\\Projects\\Personal\\ComposerCICDSamples\\BasicAssistant\\BasicAssistant\\generated\\models\\english",
-  "snapshotPath": "C:\\Projects\\Personal\\ComposerCICDSamples\\BasicAssistant\\BasicAssistant",
-  "dataSources": {
-    "hierarchical": false,
-    "inputs": [],
-    "path": "C:\\Projects\\Personal\\ComposerCICDSamples\\BasicAssistant\\BasicAssistant\\dataSources"
-  }
-}
