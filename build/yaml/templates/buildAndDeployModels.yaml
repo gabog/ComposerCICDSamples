@@ -93,7 +93,7 @@ steps:
   inputs:
     targetType: "filePath"
     filePath: "$(System.DefaultWorkingDirectory)/build/yaml/templates/OrchestratorCICD.ps1"
-    arguments: "-sourceDirectory ${{ parameters.sourceDirectory }} -crossTrainedLUDirectory ${{ parameters.sourceDirectory }}/generated/interruption -appSettingsFile ${{ parameters.sourceDirectory }}/settings/appsettings.json -destGeneratedFolder ${{ parameters.sourceDirectory }}/generated -destModelFolder ${{ parameters.sourceDirectory }}/generated/models"
+    arguments: "-sourceDirectory ${{ parameters.sourceDirectory }} -crossTrainedLUDirectory ${{ parameters.sourceDirectory }}/generated/interruption -appSettingsFile ${{ parameters.sourceDirectory }}/settings/appsettings.json -generatedDirectory ${{ parameters.sourceDirectory }}/generated -destModelFolder ${{ parameters.sourceDirectory }}/generated/models"
 
 # Compress generated folder
 - task: ArchiveFiles@2
