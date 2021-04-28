@@ -76,7 +76,7 @@ function Build-OrchestratorSnapshots
 {
     param 
     (
-        $models,
+        [string[]] $models,
         [string] $language,
         [string] $modelDirectory,
         [string] $outDirectory,
