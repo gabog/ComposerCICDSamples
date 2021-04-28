@@ -61,31 +61,31 @@ steps:
       ls -R
 
 # Publish LUIS models
-#- task: PowerShell@2
-#  displayName: "Publish LUIS"
-#  inputs:
-#    targetType: "inline"
-#    script: |
-#      $sourceDirectory = "${{ parameters.sourceDirectory }}/generated/interruption"
-#      $outputDirectory = "${{ parameters.sourceDirectory }}/generated"
+- task: PowerShell@2
+  displayName: "Publish LUIS"
+  inputs:
+    targetType: "inline"
+    script: |
+      $sourceDirectory = "${{ parameters.sourceDirectory }}/generated/interruption"
+      $outputDirectory = "${{ parameters.sourceDirectory }}/generated"
 
-#      # Build, train and publish the LUIS models
-#      bf luis:build --in $sourceDirectory --out $outputDirectory --authoringKey ${{ parameters.luisAuthoringKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
+      # Build, train and publish the LUIS models
+      bf luis:build --in $sourceDirectory --out $outputDirectory --authoringKey ${{ parameters.luisAuthoringKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
       
-#      # Output the generated settings
-#      Get-Content "$outputDirectory/luis.settings.composer.${{ parameters.luisAuthoringRegion }}.json"
+      # Output the generated settings
+      Get-Content "$outputDirectory/luis.settings.composer.${{ parameters.luisAuthoringRegion }}.json"
 
-## Publish QnA Maker KB
-#- task: PowerShell@2
-#  displayName: "Publish QnA"
-#  inputs:
-#    targetType: "inline"
-#    script: |
-#      $sourceDirectory = "${{ parameters.sourceDirectory }}/generated/interruption"
-#      $outputDirectory = "${{ parameters.sourceDirectory }}/generated"
+# Publish QnA Maker KB
+- task: PowerShell@2
+  displayName: "Publish QnA"
+  inputs:
+    targetType: "inline"
+    script: |
+      $sourceDirectory = "${{ parameters.sourceDirectory }}/generated/interruption"
+      $outputDirectory = "${{ parameters.sourceDirectory }}/generated"
       
-#      # Build, train and publish the QnA maker models
-#      bf qnamaker:build --in $sourceDirectory --out $outputDirectory --subscriptionKey ${{ parameters.qnaSubscriptionKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
+      # Build, train and publish the QnA maker models
+      bf qnamaker:build --in $sourceDirectory --out $outputDirectory --subscriptionKey ${{ parameters.qnaSubscriptionKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
 
 # Publish Orchestrator models
 - task: PowerShell@2
