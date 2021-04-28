@@ -23,14 +23,14 @@ Param(
 # Import script with common functions
 . ($PSScriptRoot + "/LUUtils.ps1")
 
-if ($PSBoundParameters.Keys.Count -lt 5) {
+if ($PSBoundParameters.Keys.Count -lt 4) {
     Write-Host "Dowload models and trains orchestrator" 
     Write-Host 'Usage: OrchestratorCICD.ps1 appsettings.json crossTrainedLUDirectory generatedDirectory modelsDirectory'
     Write-Host 'Parameters: '
     Write-Host ' appsettings.json - Bot appsettings.json file.'
     Write-Host ' crossTrainedLUDirectory - Directory containing .lu/.qna files to process.'
     Write-Host ' generatedDirectory - Directory for processed .lu files'
-    exit
+    exit 1
 }
 
 Write-Output "`t appsettings.json: $appSettingsFile"
