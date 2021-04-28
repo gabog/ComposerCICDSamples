@@ -17,8 +17,7 @@ Param(
 	[string] $sourceDirectory,
 	[string] $crossTrainedLUDirectory,
 	[string] $appSettingsFile,
-	[string] $generatedDirectory,
-	[string] $destModelFolder
+	[string] $generatedDirectory
 )
 
 # Import script with common functions
@@ -26,19 +25,17 @@ Param(
 
 if ($PSBoundParameters.Keys.Count -lt 5) {
     Write-Host "Dowload models and trains orchestrator" 
-    Write-Host 'Usage: OrchestratorCICD.ps1 appsettings.json crossTrainedLUDirectory generatedDirectory destModelFolder'
+    Write-Host 'Usage: OrchestratorCICD.ps1 appsettings.json crossTrainedLUDirectory generatedDirectory modelsDirectory'
     Write-Host 'Parameters: '
     Write-Host ' appsettings.json - Bot appsettings.json file.'
     Write-Host ' crossTrainedLUDirectory - Directory containing .lu/.qna files to process.'
     Write-Host ' generatedDirectory - Directory for processed .lu files'
-    Write-Host " destModelFolder - Directory that contains intent models (creates 'english' and 'multilingual' subfolders)."
     exit
 }
 
 Write-Output "`t appsettings.json: $appSettingsFile"
 Write-Output "`t crossTrainedLUDirectory: $crossTrainedLUDirectory"
 Write-Output "`t generatedDirectory: $generatedDirectory"
-Write-Output "`t destModelFolder: $destModelFolder"
 
 # Find the lu models for the dialogs configured to use orchestrator
 $models = Get-LUModels -recognizerType "Microsoft.OrchestratorRecognizer" -crossTrainedLUDirectory $crossTrainedLUDirectory -sourceDirectory $sourceDirectory
