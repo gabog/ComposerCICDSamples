@@ -93,7 +93,8 @@ steps:
   inputs:
     targetType: "filePath"
     filePath: "$(System.DefaultWorkingDirectory)/build/yaml/templates/Build-Orchestrator.ps1"
-    arguments: "-sourceDirectory ${{ parameters.sourceDirectory }} -crossTrainedLUDirectory ${{ parameters.sourceDirectory }}/generated/interruption -appSettingsFile ${{ parameters.sourceDirectory }}/settings/appsettings.json -generatedDirectory ${{ parameters.sourceDirectory }}/generated -destModelFolder ${{ parameters.sourceDirectory }}/generated/models"
+    arguments: "-sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -appSettingsFile ./settings/appsettings.json -generatedDirectory ./generated -destModelFolder ./generated/models"
+    workingDirectory: ${{ parameters.sourceDirectory }}
 
 # Compress generated folder
 - task: ArchiveFiles@2
