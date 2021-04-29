@@ -99,7 +99,7 @@ if ($useMultilingualModel)
 }
 
 # Update and write config file
-Write-Output "Writing output file $generatedDirectory/orchestrator.settings.json"
+Write-Output "Overwriting output file $generatedDirectory/orchestrator.settings.json"
 $bluFiles = Get-ChildItem -Path "$generatedDirectory" -Include *.blu -Name
 foreach ($bluFile in $bluFiles) 
 {
