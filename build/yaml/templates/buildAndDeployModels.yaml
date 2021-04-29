@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+﻿# Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 #
 # Builds, deploys and train language models (LUIS and QnA Maker)
@@ -44,9 +44,9 @@ steps:
       $outputDirectory = "$generatedDirectory/interruption"
       New-Item -Path /. -name $outputDirectory -ItemType "directory"
 
-# Cross train LU models (LUIS and QnA)
+# Cross train LU models
 - task: PowerShell@2
-  displayName: "Cross train LUIS and QnA"
+  displayName: "Cross train LU models"
   inputs:
     targetType: "inline"
     script: |
@@ -72,13 +72,8 @@ steps:
       # Build, train and publish the LUIS models
       bf luis:build --in $sourceDirectory --out $outputDirectory --authoringKey ${{ parameters.luisAuthoringKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
       
-      # Workaround remove version element from LUIS settings file
-      # TODO: remove once https://github.com/microsoft/botframework-cli/pull/1215 is merged
-      $luisSettingsFile = "$outputDirectory/luis.settings.composer.${{ parameters.luisAuthoringRegion }}.json"
-      Set-Content -Path $luisSettingsFile -Value (get-content -Path $luisSettingsFile | Select-String -Pattern '"version":' -NotMatch)
-
       # Output the generated settings
-      Get-Content $luisSettingsFile
+      Get-Content "$outputDirectory/luis.settings.composer.${{ parameters.luisAuthoringRegion }}.json"
 
 # Publish QnA Maker KB
 - task: PowerShell@2
@@ -91,6 +86,17 @@ steps:
       
       # Build, train and publish the QnA maker models
       bf qnamaker:build --in $sourceDirectory --out $outputDirectory --subscriptionKey ${{ parameters.qnaSubscriptionKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
+
+# Publish Orchestrator models
+# Note: the working directory needs to be set to the source's working directory
+# to allow for the creation of relative paths.
+- task: PowerShell@2
+  displayName: "Create and train orchestrator"
+  inputs:
+    targetType: "filePath"
+    filePath: "$(System.DefaultWorkingDirectory)/build/yaml/templates/Build-Orchestrator.ps1"
+    arguments: -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -appSettingsFile ./settings/appsettings.json -generatedDirectory ./generated
+    workingDirectory: ${{ parameters.sourceDirectory }}
 
 # Compress generated folder
 - task: ArchiveFiles@2
