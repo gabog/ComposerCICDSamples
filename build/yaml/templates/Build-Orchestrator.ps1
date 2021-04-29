@@ -1,17 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 # 
-# Builds and trains 
-# 
-# For example:
-# .\OrchestratorCICD.ps1 C:\Users\daveta\Downloads\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\settings\appsettings.json C:\Users\daveta\Downloads\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\generated\interruption C:\Users\daveta\Downloads\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\generated C:\Users\daveta\Downloads\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\CoreAsistantWithOrchestrator\generated\models
-#
-# Used in conjunction with CICD, performs the following:
+# Builds and trains orchestrator models. Used in conjunction with CICD, performs the following:
+#  - Determines what models to build based on the recognizer configured for each dialog
 #  - Downloads base model(s) - English, Multilingual depending on configuration
-#    Creates a "english" and "multilingual" directory.
 #  - Builds Orchestrator language models (english and multilingual) snapshot files
 #  - Creates configuration file used by runtime (orchestrator.settings.json)
-# 
 
 Param(
 	[string] $sourceDirectory,
@@ -24,18 +18,16 @@ Param(
 . ($PSScriptRoot + "/LUUtils.ps1")
 
 if ($PSBoundParameters.Keys.Count -lt 4) {
-    Write-Host "Dowload models and trains orchestrator" 
-    Write-Host 'Usage: OrchestratorCICD.ps1 appsettings.json crossTrainedLUDirectory generatedDirectory modelsDirectory'
-    Write-Host 'Parameters: '
-    Write-Host ' appsettings.json - Bot appsettings.json file.'
-    Write-Host ' crossTrainedLUDirectory - Directory containing .lu/.qna files to process.'
-    Write-Host ' generatedDirectory - Directory for processed .lu files'
+    Write-Host "Dowloads models and trains orchestrator" 
+    Write-Host "Usage:"
+    Write-Host "`t Build-Orchestrator.ps1 -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -appSettingsFile ./settings/appsettings.json -generatedDirectory ./generated"  
+    Write-Host "Parameters: "
+    Write-Host "`t  sourceDirectory - Directory containing bot's source code."
+    Write-Host "`t  crossTrainedLUDirectory - Directory containing .lu/.qna files to process."
+    Write-Host "`t  appSettingsFile - Bot appsettings.json file."
+    Write-Host "`t  generatedDirectory - Directory for processed .blu files"
     exit 1
 }
-
-Write-Output "`t appsettings.json: $appSettingsFile"
-Write-Output "`t crossTrainedLUDirectory: $crossTrainedLUDirectory"
-Write-Output "`t generatedDirectory: $generatedDirectory"
 
 # Find the lu models for the dialogs configured to use orchestrator
 $models = Get-LUModels -recognizerType "Microsoft.OrchestratorRecognizer" -crossTrainedLUDirectory $crossTrainedLUDirectory -sourceDirectory $sourceDirectory
@@ -93,7 +85,6 @@ if ($useEnglishModel)
 
     # Build snapshots
     Build-OrchestratorSnapshots -models $models -language "english" -modelDirectory $modelDirectory -outDirectory "$generatedDirectory" -luFilesDirectory $crossTrainedLUDirectory
-
 }
 
 # Download multilanguage model and build snapshots
@@ -118,6 +109,7 @@ foreach ($bluFile in $bluFiles)
     $key = $key.Replace("-", "_")
     $orchestratorConfig.orchestrator.snapshots | Add-Member -NotePropertyName "$key" -NotePropertyValue (Get-NormalizedPath -path "$generatedDirectory/$bluFile")
 }
-
-Write-Host ($orchestratorConfig | ConvertTo-Json)
 $orchestratorConfig | ConvertTo-Json | Out-File -FilePath "$generatedDirectory/orchestrator.settings.json"
+
+# Output the generated settings
+Get-Content "$generatedDirectory/orchestrator.settings.json"
