@@ -41,7 +41,7 @@ if ($models.Count -eq 0)
 # Create luConfig file with a list of the LUIS models
 $luConfigFile = "$crossTrainedLUDirectory/luConfigLuis.json"
 Write-Host "Creating $luConfigFile..."
-New-LuConfigFile -luConfig $luConfigFile -luModels $models 
+New-LuConfigFile -luConfig $luConfigFile -luModels $models -path "."
 
 # Output the generated settings
 Get-Content $luConfigFile
