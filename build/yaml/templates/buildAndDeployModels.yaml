@@ -87,7 +87,7 @@ steps:
 # Note: the working directory needs to be set to the source's working directory
 # to allow for the creation of relative paths.
 - task: PowerShell@2
-  displayName: "Create and train orchestrator"
+  displayName: "Publish orchestrator"
   inputs:
     targetType: "filePath"
     filePath: "$(System.DefaultWorkingDirectory)/build/yaml/templates/Build-Orchestrator.ps1"
