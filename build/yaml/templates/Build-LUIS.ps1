@@ -18,9 +18,9 @@ Param(
 . ($PSScriptRoot + "/LUUtils.ps1")
 
 if ($PSBoundParameters.Keys.Count -lt 5) {
-    Write-Host "Dowloads models and trains orchestrator" 
+    Write-Host "Builds, trains and publishes LUIS models" 
     Write-Host "Usage:"
-    Write-Host "`t Build-LUIS.ps1 -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -appSettingsFile ./settings/appsettings.json -outputDirectory ./generated"  
+    Write-Host "`t Build-LUIS.ps1 -outputDirectory ./generated -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -authoringKey 12345612345 -botName MyBotName"  
     Write-Host "Parameters: "
     Write-Host "`t  outputDirectory - Directory for processed config file"
     Write-Host "`t  sourceDirectory - Directory containing bot's source code."

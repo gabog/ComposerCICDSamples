@@ -8,10 +8,10 @@
 #  - Creates configuration file used by runtime (orchestrator.settings.json)
 
 Param(
+	[string] $outputDirectory,
 	[string] $sourceDirectory,
 	[string] $crossTrainedLUDirectory,
-	[string] $appSettingsFile,
-	[string] $generatedDirectory
+	[string] $appSettingsFile
 )
 
 # Import script with common functions
@@ -20,16 +20,16 @@ Param(
 if ($PSBoundParameters.Keys.Count -lt 4) {
     Write-Host "Dowloads models and trains orchestrator" 
     Write-Host "Usage:"
-    Write-Host "`t Build-Orchestrator.ps1 -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -appSettingsFile ./settings/appsettings.json -generatedDirectory ./generated"  
+    Write-Host "`t Build-Orchestrator.ps1 -outputDirectory ./generated -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -appSettingsFile ./settings/appsettings.json"  
     Write-Host "Parameters: "
+    Write-Host "`t  outputDirectory - Directory for processed .blu files"
     Write-Host "`t  sourceDirectory - Directory containing bot's source code."
     Write-Host "`t  crossTrainedLUDirectory - Directory containing .lu/.qna files to process."
     Write-Host "`t  appSettingsFile - Bot appsettings.json file."
-    Write-Host "`t  generatedDirectory - Directory for processed .blu files"
     exit 1
 }
 
-# Find the lu models for the dialogs configured to use orchestrator
+# Find the lu models for the dialogs configured to use an Orchestrator recognizer
 $models = Get-LUModels -recognizerType "Microsoft.OrchestratorRecognizer" -crossTrainedLUDirectory $crossTrainedLUDirectory -sourceDirectory $sourceDirectory
 if ($models.Count -eq 0)
 {
