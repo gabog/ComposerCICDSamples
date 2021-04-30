@@ -42,13 +42,6 @@ foreach($model in $models)
     Write-Host "`t $model"
 }
 
-#Write-Host "LUIS models"
-#$models = Get-LUModels -recognizerType "Microsoft.LuisRecognizer" -crossTrainedLUDirectory $crossTrainedLUDirectory -sourceDirectory $sourceDirectory
-#foreach($model in Get-LUModels "Microsoft.LuisRecognizer" $crossTrainedLUDirectory $sourceDirectory)
-#{
-#    Write-Host $model
-#}
-
 # Load appsettings.json
 $appSettings = Get-Content -Path $appSettingsFile | ConvertFrom-Json
 

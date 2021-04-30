@@ -1,10 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 # 
-# Contains a collection of common language understanding functions used in other scripts.
+# Contains language understanding functions used in other scripts.
 #
 
-# Gets the list of lu models for a given recognizer
+# Given directory with lu files, crawls the bot's sourceDirectory to find the recognizers for them 
+# and returns a new list of luModels that match the given recognizer kind.
 function Get-LUModels
 {
     param 
@@ -20,7 +21,7 @@ function Get-LUModels
     # Get a list of all the dialog recognizers (exclude bin and obj just in case)
     $luRecognizerDialogs = Get-ChildItem -Path $sourceDirectory -Filter "*??-??.lu.dialog" -file -name -Recurse | Where-Object { $_ -notmatch '^bin*|^obj*' }
 
-    # Add the models that matche the type to the recognizers to a list
+    # Create a list of the models that match the given recognizer
     $luModels = @()
     foreach($luModel in $crossTrainedLUModels) {
         # Load the dialog JSON and find the recognizer kind
@@ -31,7 +32,7 @@ function Get-LUModels
         # Add it to the list if it is the expected type
         if ( $recognizerKind -eq $recognizerType)
         {
-            $luModels += "$crossTrainedLUDirectory/$luModel"
+            $luModels += "$luModel"
         }
     }
 
@@ -39,7 +40,28 @@ function Get-LUModels
     return $luModels
 }
 
-# Downloads the orchestrator models based on the languages configured in appsettings.json
+# Creates luConfigFile for a list of lu models
+function New-LuConfigFile
+{
+    param
+    (
+        [string] $luConfig,
+        [string[]] $luModels
+    )
+
+    $luConfigLuis = "{
+        models:[]
+    }" | ConvertFrom-Json
+    
+    foreach($model in $models)
+    {
+        $luConfigLuis.models += "./$model"
+    }
+    
+    $luConfigLuis | ConvertTo-Json | Out-File -FilePath $luConfigFile
+}
+
+# Downloads the orchestrator models for a given language
 function Get-OrchestratoModel
 {
     param 
@@ -111,7 +133,7 @@ function Build-OrchestratorSnapshots
     bf orchestrator:build --in "$inputDirectory" --out "$outDirectory" --model "$modelDirectory"
 }
 
-# Helper to replace \ by / so it works on linux and windows
+# Helper to replace \ by / so paths work on linux and windows
 function Get-NormalizedPath
 {
     param 
