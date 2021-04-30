@@ -61,19 +61,15 @@ steps:
       ls -R
 
 # Publish LUIS models
+# Note: the working directory needs to be set to the source's working directory
+# to allow for the creation of relative paths.
 - task: PowerShell@2
   displayName: "Publish LUIS"
   inputs:
-    targetType: "inline"
-    script: |
-      $sourceDirectory = "${{ parameters.sourceDirectory }}/generated/interruption"
-      $outputDirectory = "${{ parameters.sourceDirectory }}/generated"
-
-      # Build, train and publish the LUIS models
-      bf luis:build --in $sourceDirectory --out $outputDirectory --authoringKey ${{ parameters.luisAuthoringKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
-      
-      # Output the generated settings
-      Get-Content "$outputDirectory/luis.settings.composer.${{ parameters.luisAuthoringRegion }}.json"
+    targetType: "filePath"
+    filePath: "$(System.DefaultWorkingDirectory)/build/yaml/templates/Build-LUIS.ps1"
+    arguments: -outputDirectory ./generated -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -authoringKey ${{ parameters.luisAuthoringKey }} -botName ${{ parameters.botName }} 
+    workingDirectory: ${{ parameters.sourceDirectory }}
 
 # Publish QnA Maker KB
 - task: PowerShell@2
@@ -85,17 +81,17 @@ steps:
       $outputDirectory = "${{ parameters.sourceDirectory }}/generated"
       
       # Build, train and publish the QnA maker models
-      bf qnamaker:build --in $sourceDirectory --out $outputDirectory --subscriptionKey ${{ parameters.qnaSubscriptionKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
+      bf qnamaker:build --out $outputDirectory --in $sourceDirectory --subscriptionKey ${{ parameters.qnaSubscriptionKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
 
 # Publish Orchestrator models
 # Note: the working directory needs to be set to the source's working directory
 # to allow for the creation of relative paths.
 - task: PowerShell@2
-  displayName: "Create and train orchestrator"
+  displayName: "Publish orchestrator"
   inputs:
     targetType: "filePath"
     filePath: "$(System.DefaultWorkingDirectory)/build/yaml/templates/Build-Orchestrator.ps1"
-    arguments: -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -appSettingsFile ./settings/appsettings.json -generatedDirectory ./generated
+    arguments: -generatedDirectory ./generated -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -appSettingsFile ./settings/appsettings.json
     workingDirectory: ${{ parameters.sourceDirectory }}
 
 # Compress generated folder

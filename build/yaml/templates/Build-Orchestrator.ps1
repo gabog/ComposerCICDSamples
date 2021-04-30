@@ -42,13 +42,6 @@ foreach($model in $models)
     Write-Host "`t $model"
 }
 
-#Write-Host "LUIS models"
-#$models = Get-LUModels -recognizerType "Microsoft.LuisRecognizer" -crossTrainedLUDirectory $crossTrainedLUDirectory -sourceDirectory $sourceDirectory
-#foreach($model in Get-LUModels "Microsoft.LuisRecognizer" $crossTrainedLUDirectory $sourceDirectory)
-#{
-#    Write-Host $model
-#}
-
 # Load appsettings.json
 $appSettings = Get-Content -Path $appSettingsFile | ConvertFrom-Json
 
@@ -83,8 +76,13 @@ if ($useEnglishModel)
     $modelDirectory = Get-OrchestratoModel -language "english" -modelDirectory "$generatedDirectory/orchestratorModels"
     $orchestratorConfig.orchestrator.models | Add-Member -NotePropertyName en -NotePropertyValue (Get-NormalizedPath -path "$modelDirectory")
 
+    # Create luConfig file with a list of English orchestrator models
+    $luConfigFile = "$crossTrainedLUDirectory/luConfigOrchestratorEnglish.json"
+    Write-Host "Creating $luConfigFile..."
+    New-LuConfigFile -luConfig $luConfigFile -luModels ($models | Where-Object {$_ -like '*en*.lu'}) -path "$crossTrainedLUDirectory/"
+
     # Build snapshots
-    Build-OrchestratorSnapshots -models $models -language "english" -modelDirectory $modelDirectory -outDirectory "$generatedDirectory" -luFilesDirectory $crossTrainedLUDirectory
+    bf orchestrator:build --out "$generatedDirectory" --model "$modelDirectory" --luconfig $luConfigFile
 }
 
 # Download multilanguage model and build snapshots
@@ -94,8 +92,13 @@ if ($useMultilingualModel)
     $modelDirectory = Get-OrchestratoModel -language "multilingual" -modelDirectory "$generatedDirectory/orchestratorModels"
     $orchestratorConfig.orchestrator.models | Add-Member -NotePropertyName multilang -NotePropertyValue (Get-NormalizedPath -path "$modelDirectory")
 
-    # Build snapshots and update config
-    Build-OrchestratorSnapshots -models $models -language "multilingual" -modelDirectory $modelDirectory -outDirectory "$generatedDirectory" -luFilesDirectory $crossTrainedLUDirectory
+    # Create luConfig file with a list of Multilingual orchestrator models
+    $luConfigFile = "$crossTrainedLUDirectory/luConfigOrchestratorMultilingual.json"
+    Write-Host "Creating $luConfigFile..."
+    New-LuConfigFile -luConfig $luConfigFile -luModels ($models | Where-Object {$_ -notlike '*en*.lu'}) -path "$crossTrainedLUDirectory/"
+
+    # Build snapshots
+    bf orchestrator:build --out "$generatedDirectory" --model "$modelDirectory" --luconfig $luConfigFile
 }
 
 # Update and write config file
