@@ -26,13 +26,16 @@ function Get-LUModels
     foreach($luModel in $crossTrainedLUModels) {
         # Load the dialog JSON and find the recognizer kind
         $luDialog = $luRecognizerDialogs | Where-Object { $_ -match "$luModel.dialog" }
-        $dialog = Get-Content -Path "$sourceDirectory/$luDialog" | ConvertFrom-Json
-        $recognizerKind = ($dialog | Select -ExpandProperty "`$kind")
+        
+        if(($luDialog -ne "") -and ($null -ne $luDialog)){
+            $dialog = Get-Content -Path "$sourceDirectory/$luDialog" | ConvertFrom-Json
+            $recognizerKind = ($dialog | Select -ExpandProperty "`$kind")
 
-        # Add it to the list if it is the expected type
-        if ( $recognizerKind -eq $recognizerType)
-        {
-            $luModels += "$luModel"
+            # Add it to the list if it is the expected type
+            if ( $recognizerKind -eq $recognizerType)
+            {
+                $luModels += "$luModel"
+            }
         }
     }
 
