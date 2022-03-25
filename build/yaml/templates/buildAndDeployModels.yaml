@@ -17,16 +17,11 @@ parameters:
   displayName: LUIS authoring key
   type: string
 
-- name: luisAuthoringRegion
-  displayName: LUIS authoring region
-  type: string
-
 - name: qnaSubscriptionKey
   displayName: QnA Maker subscription key
   type: string
 
 steps:
-
 # Prepare working folders
 - task: PowerShell@2
   displayName: "Prepare working folders"
@@ -60,7 +55,7 @@ steps:
       cd $outputDirectory
       ls -R
 
-# Publish LUIS models
+# Publish LUIS models if luisAuthoringKey is defined
 - task: PowerShell@2
   displayName: "Publish LUIS"
   inputs:
@@ -70,8 +65,9 @@ steps:
     # Note: the working directory needs to be set to the bot's source directory
     # to allow for the creation of relative paths in the generated config files.
     workingDirectory: ${{ parameters.sourceDirectory }}
+  condition: and(succeeded(), ne(variables['luisAuthoringKey'], ''))
 
-# Publish QnA Maker KBs
+# Publish QnA Maker KBs if qnaSubscriptionKey is defined
 - task: PowerShell@2
   displayName: "Publish QnA"
   inputs:
@@ -82,6 +78,7 @@ steps:
       
       # Build, train and publish the QnA maker models
       bf qnamaker:build --out $outputDirectory --in $sourceDirectory --subscriptionKey ${{ parameters.qnaSubscriptionKey }} --botName ${{ parameters.botName }} --suffix composer --force --log
+  condition: and(succeeded(), ne(variables['qnaSubscriptionKey'], ''))
 
 # Publish Orchestrator models
 - task: PowerShell@2

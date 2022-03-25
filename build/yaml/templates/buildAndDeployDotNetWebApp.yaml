@@ -88,7 +88,7 @@ steps:
     azureSubscription: ${{ parameters.azureServiceConnection }}
     appName: "${{ parameters.webAppName }}"
     resourceGroupName: "${{ parameters.resourceGroupName }}"
-    package: "$(System.DefaultWorkingDirectory)/output/zipDeploy/${{ parameters.webAppName }}.zip"
+    package: "$(System.DefaultWorkingDirectory)/output/zipDeploy/*.zip"
     deploymentMethod: zipDeploy
 
 # Configure web appSettings
