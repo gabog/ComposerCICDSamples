@@ -13,8 +13,8 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-# These parameters map Azure DevOps pipeline variables to paramaters 
-# that are used in # the different pipeline tasks.
+# Parameters with defaults formatted as $(name) get their values 
+# from variables of that name defined in the Azure DevOps pipeline UI. 
 parameters:
 - name: azureServiceConnection
   displayName: Azure service connection
@@ -57,33 +57,22 @@ parameters:
   default: $(BOTPROJECTNAME) 
 
 # LUIS Parameters
-# General
-- name: luisAppId
-  displayName: LUIS app ID
-  type: string
-  default: $(LUISAPPID)
-  
 # LUIS Authoring (used to build, train and publish LUIS models)
-- name: luisAuthoringRegion
-  displayName: LUIS authoring region
-  type: string
-  default: "westus"
-
-- name: luisAuthoringEndpoint
-  displayName: LUIS authoring endpoint
-  type: string
-  default: "https://westus.api.cognitive.microsoft.com"
-
 - name: luisAuthoringKey
   displayName: LUIS authoring key
   type: string
   default: $(LUISAUTHORINGKEY)
 
+- name: luisAuthoringRegion
+  displayName: LUIS authoring region
+  type: string
+  default: $(LUISAUTHORINGREGION)
+  
 # LUIS Runtime (used to access LUIS while the bot is running)
 - name: luisEndpoint
   displayName: LUIS endpoint
   type: string
-  default: "https://westus.api.cognitive.microsoft.com"
+  default: $(LUISENDPOINT)
 
 - name: luisEndpointKey
   displayName: LUIS endpoint key
@@ -117,6 +106,7 @@ parameters:
   default: "westus"
 
 steps:
+
 # Install prerequisites
 - template: templates/installPrerequisites.yaml
 
