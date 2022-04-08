@@ -63,6 +63,11 @@ parameters:
   type: string
   default: $(LUISAUTHORINGKEY)
 
+- name: luisAuthoringRegion
+  displayName: LUIS authoring region
+  type: string
+  default: $(LUISAUTHORINGREGION)
+  
 # LUIS Runtime (used to access LUIS while the bot is running)
 - name: luisEndpoint
   displayName: LUIS endpoint
@@ -111,6 +116,7 @@ steps:
     sourceDirectory: "$(System.DefaultWorkingDirectory)/${{ parameters.botProjectDirectory }}"
     botName: "${{ parameters.botName }}"
     luisAuthoringKey: "${{ parameters.luisAuthoringKey }}"
+    luisAuthoringRegion: "${{ parameters.luisAuthoringRegion }}"
     qnaSubscriptionKey: "${{ parameters.qnaSubscriptionKey }}"
 
 # Deploy and configure web app

@@ -17,6 +17,10 @@ parameters:
   displayName: LUIS authoring key
   type: string
 
+- name: luisAuthoringRegion
+  displayName: LUIS authoring region
+  type: string
+
 - name: qnaSubscriptionKey
   displayName: QnA Maker subscription key
   type: string
@@ -61,7 +65,7 @@ steps:
   inputs:
     targetType: "filePath"
     filePath: "$(System.DefaultWorkingDirectory)/build/yaml/templates/Build-LUIS.ps1"
-    arguments: -outputDirectory ./generated -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -authoringKey ${{ parameters.luisAuthoringKey }} -botName ${{ parameters.botName }} 
+    arguments: -outputDirectory ./generated -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -authoringKey ${{ parameters.luisAuthoringKey }} -authoringRegion ${{ parameters.luisAuthoringRegion }} -botName ${{ parameters.botName }} 
     # Note: the working directory needs to be set to the bot's source directory
     # to allow for the creation of relative paths in the generated config files.
     workingDirectory: ${{ parameters.sourceDirectory }}

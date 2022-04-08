@@ -11,6 +11,7 @@ Param(
 	[string] $sourceDirectory,
 	[string] $crossTrainedLUDirectory,
 	[string] $authoringKey,
+	[string] $authoringRegion,
 	[string] $botName
 )
 
@@ -20,12 +21,13 @@ Param(
 if ($PSBoundParameters.Keys.Count -lt 5) {
     Write-Host "Builds, trains and publishes LUIS models" 
     Write-Host "Usage:"
-    Write-Host "`t Build-LUIS.ps1 -outputDirectory ./generated -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -authoringKey 12345612345 -botName MyBotName"  
+    Write-Host "`t Build-LUIS.ps1 -outputDirectory ./generated -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -authoringKey 12345612345 -authoringRegion westus -botName MyBotName"  
     Write-Host "Parameters: "
     Write-Host "`t  outputDirectory - Directory for processed config file"
     Write-Host "`t  sourceDirectory - Directory containing bot's source code."
     Write-Host "`t  crossTrainedLUDirectory - Directory containing .lu/.qna files to process."
     Write-Host "`t  authoringKey - LUIS Authoring key."
+    Write-Host "`t  authoringRegion - LUIS Authoring region."
     Write-Host "`t  botName - Bot's name."
     exit 1
 }
@@ -47,4 +49,4 @@ New-LuConfigFile -luConfig $luConfigFile -luModels $models -path "."
 Get-Content $luConfigFile
 
 # Publish and tain LUIS models
-bf luis:build --out $outputDirectory --authoringKey $authoringKey --botName $botName --suffix composer --force --log --luConfig $luConfigFile
+bf luis:build --out $outputDirectory --authoringKey $authoringKey --region $authoringRegion --botName $botName --suffix composer --force --log --luConfig $luConfigFile
