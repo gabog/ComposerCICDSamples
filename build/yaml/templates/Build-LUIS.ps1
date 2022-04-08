@@ -27,7 +27,7 @@ if ($PSBoundParameters.Keys.Count -lt 5) {
     Write-Host "`t  sourceDirectory - Directory containing bot's source code."
     Write-Host "`t  crossTrainedLUDirectory - Directory containing .lu/.qna files to process."
     Write-Host "`t  authoringKey - LUIS Authoring key."
-    Write-Host "`t  authoringRegion - LUIS Authoring region."
+    Write-Host "`t  authoringRegion - LUIS Authoring region. [westus|westeurope|australiaeast]"
     Write-Host "`t  botName - Bot's name."
     exit 1
 }
