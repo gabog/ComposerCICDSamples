@@ -34,9 +34,6 @@ $models = Get-LUModels -recognizerType "Microsoft.OrchestratorRecognizer" -cross
 if ($models.Count -eq 0)
 {
     Write-Host "No orchestrator models found."
-    Write-Host $crossTrainedLUDirectory
-    Write-Host $sourceDirectory
-    Write-Host Get-Location
     exit 0        
 }
 Write-Host "Orchestrator models"
