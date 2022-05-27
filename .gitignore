@@ -351,3 +351,4 @@ MigrationBackup/
 
 # composer files
 generated/
+/BasicAssistant/BasicAssistant/settings/appsettings.Development.json
