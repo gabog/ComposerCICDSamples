@@ -29,6 +29,7 @@ function Get-LUModels
         if (($luDialog -ne "") -and ($null -ne $luDialog)) {
             $dialog = Get-Content -Path "$sourceDirectory/$luDialog" | ConvertFrom-Json
             $recognizerKind = ($dialog | Select -ExpandProperty "`$kind")
+            Write-Host $recognizerKind
 
             # Add it to the list if it is the expected type
             if ( $recognizerKind -eq $recognizerType) {
