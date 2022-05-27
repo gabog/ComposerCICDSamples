@@ -93,7 +93,7 @@ steps:
   displayName: "Publish orchestrator"
   inputs:
     targetType: "filePath"
-    filePath: "${{ parameters.yamlDirectory }}/templates/Build-Orchestrator.ps1"
+    filePath: "$(System.DefaultWorkingDirectory)/build/yaml/templates/Build-Orchestrator.ps1"
     arguments: -outputDirectory ./generated -sourceDirectory ./ -crossTrainedLUDirectory ./generated/interruption -appSettingsFile ./settings/appsettings.json
     # Note: the working directory needs to be set to the bot's source directory
     # to allow for the creation of relative paths in the generated config files.
